@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Properties>
+        <Property name="LOG_PATTERN_COLOR">
+            %style{%d{ISO8601}}{black} %highlight{%-5level }[%style{%t}{bright,blue}] %style{%C{1.}}{yellow}: %msg%n%throwable
+        </Property>
+        <Property name="LOG_PATTERN_PLAIN">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} --- thread_id="%tid" thread_name="%tn" thread_priority="%tp" --- [%p] %m%n
+        </Property>
+        <Property name="LOG_PATTERN_SIMPLE">
+            %d{yyyy-MM-dd HH:mm:ss.SSS} --- ["%tid"] "%tn" ("%tp") --- [%p] %m%n
+        </Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="${LOG_PATTERN_SIMPLE}" />
+        </Console>
+        
+        <Console name="ConsoleColor" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="${LOG_PATTERN_COLOR}" />
+        </Console>
+        
+        <Console name="ConsoleJSON" target="SYSTEM_OUT">
+            <JsonLayout complete="false" compact="false">
+            </JsonLayout>
+        </Console>        
+        <Console name="ConsoleJSONApp" target="SYSTEM_OUT">
+            <JsonLayout complete="false" compact="false">
+                <KeyValuePair key="fixmpbx" value="true" />
+            </JsonLayout>
+        </Console>        
+
+        <RollingFile name="RollingFile"
+            fileName="./logs/spring-boot-logger-log4j2.log"
+            filePattern="./logs/$${date:yyyy-MM}/spring-boot-logger-log4j2-%d{-dd-MMMM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <pattern>%d %p %C{1.} [%t] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <!-- rollover on startup, daily and when the file reaches 
+                    10 MegaBytes -->
+                <OnStartupTriggeringPolicy />
+                <SizeBasedTriggeringPolicy
+                    size="10 MB" />
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- LOG everything at INFO level -->
+        <Logger name="Logger" level="INFO" additivity="false">
+            <AppenderRef level="INFO" ref="ConsoleColor"/>
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef level="INFO" ref="Console" />
+        </Root>
+    </Loggers>
+
+</Configuration>
