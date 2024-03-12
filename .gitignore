@@ -47,3 +47,5 @@ webpack.generated.js
 /00_db/
 mydata/frontend/generated/
 target/
+
+nb-configuration.xml

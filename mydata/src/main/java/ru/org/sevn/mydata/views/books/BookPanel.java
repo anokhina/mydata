@@ -4,7 +4,6 @@ import com.querydsl.core.types.dsl.StringPath;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -22,7 +21,7 @@ public class BookPanel extends FormLayout {
     private VaEntityMultiselectCombobox<TagEntity> tags;
     private TextField img = new TextField ("img");
     private TextField url = new TextField ("url");
-    private TextField content = new TextField ("content");
+    private TextArea content = new TextArea ("content");
     private ComboBox<IndexLanguageEnum> lang = new ComboBox<IndexLanguageEnum> ("lang", IndexLanguageEnum.values ());
 
     private BeanValidationBinder<BookModel> binder = new BeanValidationBinder (BookModel.class);
@@ -34,6 +33,7 @@ public class BookPanel extends FormLayout {
         tags.setNewObjectBuilder (s -> new TagEntity ().value (s), repo);
         add (lang, title, author, img, new Div (), url, content, dsc, tags);
         //binder.setValidatorsDisabled(false);
+        content.setHeight ("30em");
         dsc.setHeight ("30em");
         binder.bindInstanceFields (this);
     }

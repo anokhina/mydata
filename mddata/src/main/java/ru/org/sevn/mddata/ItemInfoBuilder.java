@@ -21,8 +21,12 @@ import com.vladsch.flexmark.ast.Paragraph;
 import com.vladsch.flexmark.ast.Reference;
 import com.vladsch.flexmark.util.ast.Node;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.stream.Collectors;
 
 public class ItemInfoBuilder {
 
@@ -34,6 +38,67 @@ public class ItemInfoBuilder {
 
     public ItemInfo getObject () {
         return ii;
+    }
+
+    private static final String nl = "\n";
+
+    private static String nn (String s) {
+        return s == null ? "" : s;
+    }
+
+    private static void print (StringBuilder sb, String propName, String propValue) {
+        sb.append (nl).append ("[//]: # (" + propName + ")");
+        if (propValue != null) {
+            sb.append (nl);
+            sb.append (nn (propValue)).append (nl);
+        }
+    }
+
+    private static String img (String s) {
+        return "[<img src=\"" + s + "\" width=\"150\"/>](" + s + ")";
+    }
+
+    private static String code (String s) {
+        //TODO replacement
+        return "`" + s.replace ("`", "") + "`";
+    }
+
+    private static String content (String s) {
+        return "[" + code (s) + "](" + URLEncoder.encode (s, StandardCharsets.UTF_8) + ")";
+    }
+
+    private String date (Date date) {
+        if (date != null) {
+            var sdf = new SimpleDateFormat ("yyyy-MM-dd_HH:mm:ss");
+            return sdf.format (date);
+        }
+        return null;
+    }
+
+    public String print () {
+        StringBuilder sb = new StringBuilder ();
+
+        print (sb, "title", "## " + nn (ii.title ()));
+        print (sb, "author", ii.author ());
+        print (sb, "dsc", ii.description ());
+        print (sb, "tags", ii.tags ().stream ().map (e -> "- " + e).collect (Collectors.joining ("\n")));
+        print (sb, "img", img (ii.img ())); //TODO
+        print (sb, "url", ii.url ()); //TODO
+
+        if (ii.content ().isEmpty ()) {
+            print (sb, "content", null);
+        }
+        else {
+            ii.content ().forEach (c -> {
+                print (sb, "content", content (c));
+            });
+        }
+
+        print (sb, "indexed=" + ii.indexed (), null);
+        print (sb, "changed=" + ii.changed (), null);
+        print (sb, "date=" + date (ii.date ()), null);
+        print (sb, "date +%F_%T", null);
+        return sb.toString ();
     }
 
     public ItemInfo addProp (Prop p) throws Exception {

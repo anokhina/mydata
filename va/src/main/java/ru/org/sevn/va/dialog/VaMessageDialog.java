@@ -1,5 +1,6 @@
 package ru.org.sevn.va.dialog;
 
+import ru.org.sevn.va.scroll.UseScroll;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasText;
@@ -17,26 +18,6 @@ import ru.org.sevn.va.VaIcons;
 import ru.org.sevn.va.VaUtil;
 
 public class VaMessageDialog<MSGCMP extends Component & HasSize> extends Dialog {
-
-    public interface UseScrollHorizontal extends UseScroll {
-        @Override
-        default Scroller.ScrollDirection useScrollDirection () {
-            return Scroller.ScrollDirection.HORIZONTAL;
-        }
-    }
-
-    public interface UseScrollVertical extends UseScroll {
-        @Override
-        default Scroller.ScrollDirection useScrollDirection () {
-            return Scroller.ScrollDirection.VERTICAL;
-        }
-    }
-
-    public interface UseScroll {
-        default Scroller.ScrollDirection useScrollDirection () {
-            return Scroller.ScrollDirection.NONE;
-        }
-    }
 
     private final H3 title = new H3 ();
     private final HorizontalLayout buttonsPanel = new HorizontalLayout ();
@@ -162,12 +143,7 @@ public class VaMessageDialog<MSGCMP extends Component & HasSize> extends Dialog 
 
     @Override
     public void open () {
-        if (messageContainer.getContent () instanceof UseScroll) {
-            messageContainer.setScrollDirection ( ((UseScroll) messageContainer.getContent ()).useScrollDirection ());
-        }
-        else {
-            messageContainer.setScrollDirection (Scroller.ScrollDirection.BOTH);
-        }
+        UseScroll.setScrollDirection (messageContainer);
         super.open ();
     }
 }

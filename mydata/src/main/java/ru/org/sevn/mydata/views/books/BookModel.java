@@ -15,6 +15,7 @@ import ru.org.sevn.mydata.entity.TagEntity;
 @Accessors (fluent = true, chain = true)
 public class BookModel {
 
+    private String pathId;
     @NotEmpty
     @NotNull
     private String title;
@@ -32,6 +33,14 @@ public class BookModel {
     private BookEntity entity;
 
     private IndexLanguageEnum lang;
+
+    public String getPathId () {
+        return pathId;
+    }
+
+    public void setPathId (String pathId) {
+        this.pathId = pathId;
+    }
 
     public String getTitle () {
         return title;

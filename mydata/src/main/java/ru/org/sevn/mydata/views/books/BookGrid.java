@@ -42,6 +42,7 @@ public class BookGrid extends Grid<BookModel> {
                 .setResizable (true)
                 .setWidth ("20px");
 
+        var pathId = addColumn (BookModel::pathId).setHeader ("pathId").setResizable (true);
         var title = addColumn (BookModel::title).setHeader ("title").setResizable (true);
         var url = addColumn (BookModel::url).setHeader ("url").setResizable (true);
         var tags = addColumn (new Tag<BookModel> ("div")

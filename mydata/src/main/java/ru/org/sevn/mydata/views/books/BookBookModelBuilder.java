@@ -16,6 +16,7 @@ public class BookBookModelBuilder implements ModelConverter<BookEntity, BookMode
         BookEntity b = bm.getEntity ();
         if (b == null) {
             b = new BookEntity ();
+            //TODO pathId
         }
 
         b
@@ -36,6 +37,7 @@ public class BookBookModelBuilder implements ModelConverter<BookEntity, BookMode
         b.entity (bm);
 
         b
+                .pathId (bm.pathId ())
                 .author (author (bm.author ()))
                 .content (bm.content ())
                 .dsc (bm.dsc ())

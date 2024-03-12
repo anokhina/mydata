@@ -4,30 +4,36 @@ import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import static java.nio.file.FileVisitResult.*;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileWalker extends SimpleFileVisitor<Path> {
 
-    private final String excludeName;
-    private final PathMatcher matcher;
+    private final List<String> excludeNames;
+    private final List<PathMatcher> matchers;
     private final FileProcessor fileProcessor;
 
-    public FileWalker (final FileProcessor metadataExtractor, final String excludeName) {
-        this.excludeName = excludeName;
+    public FileWalker (final FileProcessor metadataExtractor, final String... excludeName) {
+        this.excludeNames = List.of (excludeName);
         this.fileProcessor = metadataExtractor;
-        matcher = FileSystems.getDefault ().getPathMatcher ("glob:" + excludeName);
+        matchers = excludeNames.stream ().map (en -> FileSystems.getDefault ().getPathMatcher ("glob:" + en)).toList ();
     }
 
     boolean canWalk (Path file, BasicFileAttributes attrs) {
         final Path name = file.getFileName ();
-        if (name != null && matcher.matches (name)) {
+        if (name != null && matchers.stream ().filter (m -> m.matches (name)).findAny ().isPresent ()) {
             System.out.println (file);
             return false;
         }
         if (attrs.isDirectory ()) {
-            Path child = file.resolve (excludeName);
-            if (child != null && child.toFile ().exists ()) {
+            if (excludeNames
+                    .stream ()
+                    .map (excludeName -> file.resolve (excludeName))
+                    .filter (child -> child != null && child.toFile ().exists ())
+                    .findAny ()
+                    .isPresent ()) {
+
                 return false;
             }
         }

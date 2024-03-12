@@ -32,19 +32,29 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors (fluent = true, chain = true)
 public class ItemInfo {
-    private String lang;
+    private String lang;//
+    private String pathId;//
     private String path;
-    private String title;
-    private String author;
-    private String description;
-    private Set<String> tags = new HashSet ();
-    private String img;
-    private String url;
-    private List<String> content = new ArrayList ();
+    private String title;//
+    private String author;//
+    private String description;//dsc
+    private Set<String> tags = new HashSet ();//
+    private String img;//
+    private String url;//
+    private List<String> content = new ArrayList ();//
     private boolean indexed;
     private boolean changed;
     private Date date;
     private Map<String, Long> contentSize = new HashMap ();
+
+    public String getPathId () {
+        return pathId;
+    }
+
+    public ItemInfo setPathId (String pathId) {
+        this.pathId = pathId;
+        return this;
+    }
 
     public String getTitle () {
         return title;

@@ -26,6 +26,8 @@ public class BookEntity extends DbEntity implements Identified<String> {
     @Id
     @EqualsAndHashCode.Include
     private String id;
+    @Indexed (unique = true)
+    private String pathId;
     @TextIndexed
     private String title;
     @Indexed
@@ -38,9 +40,19 @@ public class BookEntity extends DbEntity implements Identified<String> {
     private String url;
     @Indexed
     private String content;
+    @Indexed
+    private List<StringLongObject> contentSize = new ArrayList ();
 
     @Language
     private String lang;
+
+    public String getPathId () {
+        return pathId;
+    }
+
+    public void setPathId (String pathId) {
+        this.pathId = pathId;
+    }
 
     @Override
     public String getId () {
@@ -105,6 +117,14 @@ public class BookEntity extends DbEntity implements Identified<String> {
 
     public void setContent (String content) {
         this.content = content;
+    }
+
+    public List<StringLongObject> getContentSize () {
+        return contentSize;
+    }
+
+    public void setContentSize (List<StringLongObject> contentSize) {
+        this.contentSize = contentSize;
     }
 
 }

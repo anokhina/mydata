@@ -17,19 +17,16 @@ package ru.org.sevn.mddata;
 
 import com.vladsch.flexmark.util.ast.Node;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.json.JSONObject;
-//import ru.org.sevn.mydata.util.BookEntityComponent;
-//import ru.org.sevn.mydata.util.TagEntityComponent;
 
 @Log
 public class FileIndexer {
 
     public static ItemInfo getItemInfo (final Path filePath) throws Exception {
-        log.info ("Try to parse: " + filePath.toString ());
+        log.log (Level.INFO, "Try to parse: {0}", filePath.toString ());
         final String src = MdFileParser.readFile (filePath);
 
         final Node doc = MdFileParser.parse (src);
@@ -58,27 +55,8 @@ public class FileIndexer {
         throw new Exception ("Can't parse " + filePath);
     }
 
-    /*
-    public static void md (final Path filePath, TagEntityComponent tagEntityComponent) throws IOException {
-
-        try {
-            var ii = getItemInfo (filePath);
-
-            System.out.println (">>ii>" + ii);
-
-            System.out.println (">>ib>" + BookEntityComponent.build (ii, tagEntityComponent));
-
-        }
-        catch (Exception e) {
-            log.log (Level.SEVERE, "Fail to parse: " + filePath.toString (), e);
-        }
-
+    public static String print (ItemInfo ii) {
+        ItemInfoBuilder iib = new ItemInfoBuilder (ii);
+        return iib.print ();
     }
-
-    public static void main (String... args) throws IOException {
-        // /media/sevn/SP\ PHD\ U31/DATA/books/202201/11/161541/index.md
-        var mdfile = "/media/sevn/SP PHD U31/DATA/books/202201/11/161541/index.md";
-        md (Path.of (mdfile), null);
-    }
-    */
 }
