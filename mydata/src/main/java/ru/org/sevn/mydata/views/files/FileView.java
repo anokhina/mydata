@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FilenameUtils;
@@ -33,7 +32,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import ru.org.sevn.mydata.entity.FileEntity;
 import ru.org.sevn.mydata.repo.FileEntityRepository;
 import ru.org.sevn.mydata.repo.TagEntityRepository;
-import ru.org.sevn.va.VaUtil;
+import ru.org.sevn.mydata.views.FileUtil;
 import ru.org.sevn.va.data.ModelRepositoryDataProvider;
 import ru.org.sevn.va.data.NoModelConverter;
 import ru.org.sevn.va.dialog.VaMessageDialog;
@@ -176,16 +175,7 @@ public class FileView extends VerticalLayout implements HasUrlParameter<String> 
         grid.setHeight ("90vh");
 
         grid.setControlClick ( (lm, evt) -> {
-            try {
-                var err = new FileOpener ().dir (lm.path ());
-                if (err != null) {
-                    Notification.show ("Error: can't open " + lm.path () + ". " + err);
-                }
-            }
-            catch (Exception ex) {
-                Notification.show ("Error: can't open " + lm.path ());
-                Logger.getLogger (FileView.class.getName ()).log (Level.SEVERE, null, ex);
-            }
+            FileUtil.open (lm.path ());
         });
         grid.setDelClick ( (lm, evt) -> {
             var f = new File (lm.path ());

@@ -27,7 +27,10 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.stream.Collectors;
+import lombok.extern.java.Log;
+import ru.org.sevn.log.LogUtil;
 
+@Log
 public class ItemInfoBuilder {
 
     private final ItemInfo ii;
@@ -131,8 +134,13 @@ public class ItemInfoBuilder {
                 case "changed" :
                     return ii.setChanged (Boolean.valueOf (p.getValue ()));
                 case "date" :
-                    SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd_HH:mm:ss");//2022-01-11_16:50:22
-                    return ii.setDate (sdf.parse (p.getValue ()));
+                    try {
+                        SimpleDateFormat sdf = new SimpleDateFormat ("yyyy-MM-dd_HH:mm:ss");//2022-01-11_16:50:22
+                        return ii.setDate (sdf.parse (p.getValue ()));
+                    }
+                    catch (Exception ex) {
+                        LogUtil.error (log, null, ex);
+                    }
             }
         }
         return ii;

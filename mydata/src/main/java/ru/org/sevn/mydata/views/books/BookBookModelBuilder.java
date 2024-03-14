@@ -16,7 +16,7 @@ public class BookBookModelBuilder implements ModelConverter<BookEntity, BookMode
         BookEntity b = bm.getEntity ();
         if (b == null) {
             b = new BookEntity ();
-            //TODO pathId
+            b.pathId (bm.pathId ());
         }
 
         b

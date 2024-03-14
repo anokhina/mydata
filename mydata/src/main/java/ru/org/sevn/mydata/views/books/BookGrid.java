@@ -5,14 +5,19 @@ import com.querydsl.core.types.dsl.StringPath;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.dataview.GridDataView;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import java.nio.file.Path;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import ru.org.sevn.mydata.entity.BookEntity;
 import ru.org.sevn.mydata.entity.QBookEntity;
 import ru.org.sevn.mydata.entity.QTagEntity;
 import ru.org.sevn.mydata.entity.TagEntity;
 import ru.org.sevn.mydata.repo.BookEntityRepository;
 import ru.org.sevn.mydata.repo.TagEntityRepository;
+import ru.org.sevn.mydata.views.FileUtil;
 import ru.org.sevn.mydata.views.tags.TagsFilter;
 import ru.org.sevn.va.USymbol;
 import ru.org.sevn.va.data.ModelRepositoryDataProvider;
@@ -28,7 +33,14 @@ public class BookGrid extends Grid<BookModel> {
 
     private BiConsumer<BookModel, ClickEvent> controlClick = (e, evt) -> {};
 
-    public BookGrid (TagEntityRepository tagEntityRepository) {
+    @Setter
+    @Accessors (fluent = true, chain = true)
+    public static class Ctx {
+        TagEntityRepository tagEntityRepository;
+        Supplier<Path> supplierDataDir;
+    }
+
+    public BookGrid (Ctx ctx) {
         super (BookModel.class, false);
 
         this.control = addColumn (new Tag ("div")
@@ -42,7 +54,17 @@ public class BookGrid extends Grid<BookModel> {
                 .setResizable (true)
                 .setWidth ("20px");
 
-        var pathId = addColumn (BookModel::pathId).setHeader ("pathId").setResizable (true);
+        var pathId = //addColumn (BookModel::pathId)
+                addColumn (Tag.of (this, "div")
+                        .addTagContent (el -> el.pathId ())
+                        .addAttribute (OnClick.of (this.getBeanType (), (e, evt) -> {
+                            //
+                            if (evt.isCtrlKey ()) {
+                                FileUtil.open ( () -> Path.of (ctx.supplierDataDir.get ().toString (), e.getPathId ()).toString ());
+                            }
+                        }))
+                        .getLitRenderer ())
+                        .setHeader ("pathId").setResizable (true);
         var title = addColumn (BookModel::title).setHeader ("title").setResizable (true);
         var url = addColumn (BookModel::url).setHeader ("url").setResizable (true);
         var tags = addColumn (new Tag<BookModel> ("div")
@@ -74,7 +96,7 @@ public class BookGrid extends Grid<BookModel> {
         }
         {
             ListPath<TagEntity, QTagEntity> path = QBookEntity.bookEntity.tags;
-            var tf = new TagsFilter ( () -> tagEntityRepository, path, (n, v) -> {
+            var tf = new TagsFilter ( () -> ctx.tagEntityRepository, path, (n, v) -> {
                 if (v == null || v.isEmpty ()) {
                     filter.setPropertyFilter (n, null);
                 }

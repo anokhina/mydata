@@ -18,6 +18,9 @@ package ru.org.sevn.mddata;
 import com.vladsch.flexmark.util.ast.Node;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import lombok.extern.java.Log;
 import org.json.JSONObject;
@@ -35,12 +38,10 @@ public class FileIndexer {
         ItemInfo ii = iib.fromNode (doc);
 
         if (! ii.isContentEmpty ()) {
-            for (String c : ii.getContent ()) {
-                final File cf = new File (filePath.toFile ().getParentFile (), c);
-                if (cf.exists ()) {
-                    ii.addContentSize (c, cf.length ());
-                }
-            }
+            var cs = getContentSizes (filePath.getParent (), ii.getContent ());
+            cs.forEach ( (k, v) -> {
+                ii.addContentSize (k, v);
+            });
         }
         if ( (ii.getUrl () == null || ii.getUrl ().trim ().length () == 0) ||
                 (ii.isContentEmpty ())) {
@@ -53,6 +54,21 @@ public class FileIndexer {
             log.severe (">>>" + jo.toString (2));
         }
         throw new Exception ("Can't parse " + filePath);
+    }
+
+    public static Map<String, Long> getContentSizes (final Path dir, String... lines) {
+        return getContentSizes (dir, () -> Arrays.stream (lines).iterator ());
+    }
+
+    public static Map<String, Long> getContentSizes (final Path dir, Iterable<String> lines) {
+        var res = new LinkedHashMap<String, Long> ();
+        for (String c : lines) {
+            final File cf = new File (dir.toFile (), c);
+            if (cf.exists ()) {
+                res.put (c, cf.length ());
+            }
+        }
+        return res;
     }
 
     public static String print (ItemInfo ii) {
