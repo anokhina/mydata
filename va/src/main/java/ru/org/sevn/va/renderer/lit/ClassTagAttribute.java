@@ -9,7 +9,8 @@ public class ClassTagAttribute<OBJ> extends AnyTagAttribute<OBJ> {
     }
 
     public ClassTagAttribute (Function<OBJ, String> titleProducer) {
-        super ("className", "class='${item.className}'", e -> titleProducer.apply (e));
+        super ("className",
+                (ta) -> "class='${item." + ta.getPropertyId () + "}'", e -> titleProducer.apply (e));
     }
 
 }

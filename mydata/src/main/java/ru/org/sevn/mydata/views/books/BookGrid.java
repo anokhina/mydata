@@ -25,13 +25,18 @@ import ru.org.sevn.va.grid.TextFieldFilter;
 import ru.org.sevn.va.renderer.lit.ClickEvent;
 import ru.org.sevn.va.renderer.lit.OnClick;
 import ru.org.sevn.va.renderer.lit.Tag;
+import ru.org.sevn.va.renderer.lit.Tags;
 
 public class BookGrid extends Grid<BookModel> {
 
     private final BookEntityQdslFilter filter = new BookEntityQdslFilter ();
     private final Grid.Column<BookModel> control;
 
+    @Setter
     private BiConsumer<BookModel, ClickEvent> controlClick = (e, evt) -> {};
+
+    @Setter
+    private BiConsumer<BookModel, ClickEvent> rebuildClick = (e, evt) -> {};
 
     @Setter
     @Accessors (fluent = true, chain = true)
@@ -43,11 +48,17 @@ public class BookGrid extends Grid<BookModel> {
     public BookGrid (Ctx ctx) {
         super (BookModel.class, false);
 
-        this.control = addColumn (new Tag ("div")
-                .addTagContent (e -> USymbol.OPEN_FOLDER)
-                .addAttribute (new OnClick ( (e, evt) -> {
-                    controlClick.accept ((BookModel) e, (ClickEvent) evt);
-                }))
+        this.control = addColumn (new Tags<> (
+                new Tag ("div")
+                        .addTagContent (e -> USymbol.OPEN_FOLDER)
+                        .addAttribute (new OnClick ( (e, evt) -> {
+                            controlClick.accept ((BookModel) e, (ClickEvent) evt);
+                        })),
+                new Tag ("div")
+                        .addTagContent (e -> USymbol.CLOCKWISE_DOWNWARDS_AND_UPWARDS_OPEN_CIRCLE_ARROWS)
+                        .addAttribute (new OnClick ( (e, evt) -> {
+                            rebuildClick.accept ((BookModel) e, (ClickEvent) evt);
+                        })))
                 .getLitRenderer ());
         control
                 .setFrozen (true)
@@ -108,10 +119,6 @@ public class BookGrid extends Grid<BookModel> {
             filter.setPropertyFilter (tf.getName (), null);
             headerRow.getCell (tags).setComponent (tf);
         }
-    }
-
-    public void setControlClick (BiConsumer<BookModel, ClickEvent> controlClick) {
-        this.controlClick = controlClick;
     }
 
     public GridDataView<BookModel> setItems (ModelRepositoryDataProvider<BookEntity, BookModel, BookEntityRepository, BookEntityQdslFilter> dp) {

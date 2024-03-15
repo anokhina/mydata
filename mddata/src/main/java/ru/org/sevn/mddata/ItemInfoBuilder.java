@@ -84,7 +84,7 @@ public class ItemInfoBuilder {
         print (sb, "title", "## " + nn (ii.title ()));
         print (sb, "author", ii.author ());
         print (sb, "dsc", ii.description ());
-        print (sb, "tags", ii.tags ().stream ().map (e -> "- " + e).collect (Collectors.joining ("\n")));
+        print (sb, "tags", ii.tags ().stream ().map (e -> "- " + e).collect (Collectors.joining ("  \n")));
         print (sb, "img", img (ii.img ())); //TODO
         print (sb, "url", ii.url ()); //TODO
 

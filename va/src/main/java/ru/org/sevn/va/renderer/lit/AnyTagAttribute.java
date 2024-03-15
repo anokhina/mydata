@@ -26,9 +26,14 @@ public class AnyTagAttribute<OBJ> extends TagAttribute<OBJ> {
         this.provider = provider;
     }
 
+    public AnyTagAttribute (String property, Function<TagAttribute<OBJ>, String> templateBuilder, ValueProvider<OBJ, ?> provider) {
+        super (property, templateBuilder);
+        this.provider = provider;
+    }
+
     @Override
     public LitRenderer<OBJ> addValueFuntionality (LitRenderer<OBJ> lr) {
-        lr.withProperty (getProperty (), provider);
+        lr.withProperty (getPropertyId (), provider);
         return lr;
     }
 

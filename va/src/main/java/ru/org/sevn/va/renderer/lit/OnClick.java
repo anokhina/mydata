@@ -8,7 +8,10 @@ public class OnClick<OBJ> extends TagAttribute<OBJ> {
     private final BiConsumer<OBJ, ClickEvent> onClick;
 
     public OnClick (BiConsumer<OBJ, ClickEvent> onClick) {
-        super ("onClick", "@click=${(e) => {onClick(e.shiftKey, e.ctrlKey, e.altKey, e.metaKey); e.preventDefault();}}");
+        super ("onClick",
+                (ta) -> {
+                    return "@click=${(e) => {" + ta.getPropertyId () + "(e.shiftKey, e.ctrlKey, e.altKey, e.metaKey); e.preventDefault();}}";
+                });
         this.onClick = onClick;
     }
 
@@ -18,7 +21,7 @@ public class OnClick<OBJ> extends TagAttribute<OBJ> {
 
     @Override
     public LitRenderer<OBJ> addValueFuntionality (LitRenderer<OBJ> lr) {
-        lr.withFunction (getProperty (), (el, args) -> {
+        lr.withFunction (getPropertyId (), (el, args) -> {
             var evt = new ClickEvent ();
             evt.shiftKey = args.getBoolean (0);
             evt.ctrlKey = args.getBoolean (1);

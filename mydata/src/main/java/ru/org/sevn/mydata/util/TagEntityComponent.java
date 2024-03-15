@@ -23,9 +23,10 @@ public class TagEntityComponent {
     public Collection<TagEntity> getTags (Iterable<String> tagNames) {
         var newTags = new HashSet<String> ();
         var res = new HashSet<TagEntity> ();
-        for (var tn : tagNames) {
+        for (var tns : tagNames) {
+            var tn = tns.trim ();
             var hasElem = new AtomicBoolean (false);
-            var tags = tagEntityRepository.findAll (QTagEntity.tagEntity.value.containsIgnoreCase (tn));
+            var tags = tagEntityRepository.findAll (QTagEntity.tagEntity.value.equalsIgnoreCase (tn));
             tags.forEach (e -> {
                 hasElem.set (true);
                 res.add (e);

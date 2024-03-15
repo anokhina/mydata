@@ -11,4 +11,11 @@ public class AnyBooleanTagAttribute<OBJ> extends AnyTagAttribute<OBJ> {
         });
     }
 
+    public AnyBooleanTagAttribute (String property, Function<TagAttribute<OBJ>, String> templateBuilder, Function<OBJ, Boolean> booleanProducer) {
+        super (property, templateBuilder, el -> {
+            java.lang.Boolean b = booleanProducer.apply (el);
+            return (b != null) ? b : false;
+        });
+    }
+
 }

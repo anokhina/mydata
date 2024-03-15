@@ -18,6 +18,7 @@ public class VaDialog<MSGCMP extends Component & HasSize> extends Dialog impleme
     public static final String ATTENTION = "Внимание";
 
     public static final String BUTTON_OK = "OK";
+    public static final String BUTTON_Cancel = "Cancel";
 
     @Getter
     @Setter

@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.stereotype.Component;
 import ru.org.sevn.mddata.FileIndexer;
 import ru.org.sevn.mydata.entity.BookEntity;
 import ru.org.sevn.mydata.entity.QTagEntity;
@@ -61,13 +63,32 @@ public class BookView extends VerticalLayout {
 
     private AddDialog editorAdd;
 
+    @Component
+    public static class AutowiredCtx {
+        @Autowired
+        MongoTemplate mongoTemplate;
+        @Autowired
+        BookEntityRepository bookEntityRepository;
+        @Autowired
+        SettingsEntityRepository settingsEntityRepository;
+        @Autowired
+        TagEntityRepository tagEntityRepository;
+        @Autowired
+        TagEntityComponent tagEntityComponent;
+    }
+
+    private final AutowiredCtx actx;
+
     @Autowired
     public BookView (
-            MongoTemplate mongoTemplate,
-            BookEntityRepository bookEntityRepository,
-            SettingsEntityRepository settingsEntityRepository,
-            TagEntityRepository tagEntityRepository,
-            TagEntityComponent tagEntityComponent) {
+            AutowiredCtx actx) {
+        var tagEntityRepository = actx.tagEntityRepository;
+        var settingsEntityRepository = actx.settingsEntityRepository;
+        var tagEntityComponent = actx.tagEntityComponent;
+        var bookEntityRepository = actx.bookEntityRepository;
+        var mongoTemplate = actx.mongoTemplate;
+
+        this.actx = actx;
         grid = new BookGrid (new BookGrid.Ctx ()
                 .tagEntityRepository (tagEntityRepository)
                 .supplierDataDir ( () -> pathData (settingsEntityRepository))
@@ -165,24 +186,7 @@ public class BookView extends VerticalLayout {
 
                         d.addCancel ( () -> true);
                         d.addButtonOk ( () -> {
-                            try {
-                                var dirName = tf.getValue ().replace ("\\", "");
-                                var dirPath = Path.of (dirName);
-
-                                var pathData = pathData (settingsEntityRepository);
-                                var fileProcessor = new BookFileProcessor (pathData, bookEntityRepository, tagEntityComponent);
-                                fileProcessor.setDirExact (dirPath);
-                                final FileWalker fileWalker = new FileWalker (fileProcessor);
-
-                                Files.walkFileTree (dirPath, fileWalker);
-
-                                return true;
-                            }
-                            catch (Exception ex) {
-                                Notification.show ("Can't index: " + tf.getValue ());
-                                error (log, null, ex);
-                                return false;
-                            }
+                            return rebuild (tf.getValue ().replace ("\\", ""));
                         });
                     }).open ();
         });
@@ -229,6 +233,44 @@ public class BookView extends VerticalLayout {
             editorAdd.getMessage ().getBinder ().setBean (lm);
             editorAdd.open ();
         });
+
+        grid.setRebuildClick ( (lm, evt) -> {
+            var pathData = pathData (actx.settingsEntityRepository);
+            if (pathData != null) {
+                var p = Path.of (pathData.toString (), lm.getPathId ());
+                
+                new VaTextDialog("Переиндексировать " + p.toString() + "?", VaTextDialog.BUTTON_Cancel)
+                        .configure(d -> {
+                            d.addButtonOk(() -> {
+                                return rebuild(p.toString());
+                            });
+                        }).open();
+            }
+
+        });
+    }
+
+    private boolean rebuild (String dirName) {
+        try {
+            var dirPath = Path.of (dirName);
+
+            var pathData = pathData (actx.settingsEntityRepository);
+            var fileProcessor = new BookFileProcessor (pathData, actx.bookEntityRepository, actx.tagEntityComponent);
+            fileProcessor.setPathLog(new ArrayList<>());
+            fileProcessor.setDirExact (dirPath);
+            final FileWalker fileWalker = new FileWalker (fileProcessor);
+
+            Files.walkFileTree (dirPath, fileWalker);
+            
+            Notification.show ("Проиндексировано файлов: " + fileProcessor.getPathLog().size());
+
+            return true;
+        }
+        catch (Exception ex) {
+            Notification.show ("Can't index: " + dirName);
+            error (log, null, ex);
+            return false;
+        }
     }
 
     private static boolean dirExists (Path pathData) {

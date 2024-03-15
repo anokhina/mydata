@@ -6,6 +6,8 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.List;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.org.sevn.mddata.FileIndexer;
@@ -24,6 +26,10 @@ public class BookFileProcessor implements FileProcessor {
     private final BookEntityRepository bookEntityRepository;
     private final TagEntityComponent tagEntityComponent;
 
+    @Setter
+    @Getter
+    private List<Path> pathLog;
+    
     @Setter
     private Path dirExact;
 
@@ -66,6 +72,9 @@ public class BookFileProcessor implements FileProcessor {
                     System.out.println (">>ib>" + be);
 
                     writeIndexed (dir, filePath.getParent (), be, FILE_NAME_INDEXED);
+                    if (pathLog != null) {
+                        pathLog.add(filePath);
+                    }
                 }
             }
         }

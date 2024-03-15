@@ -22,6 +22,7 @@ public class LitRendererFactory {
                 .addTagContent (textProducer)
                 .addAttribute (new TitleTagAttribute (toolTipProducer))
                 .addAttribute (new ClassTagAttribute (classNameProducer))
+                /////////
                 .addAttribute (new AnyTagAttribute ("url", ref))
                 .getLitRenderer ();
     }
@@ -43,7 +44,7 @@ public class LitRendererFactory {
                 .addAttribute (new TitleTagAttribute (toolTipProducer))
                 .addAttribute (new OnClick (onClick))
                 .addAttribute (new ReadonlyTagAttribute (e -> readOnly))
-                .addAttribute (new AnyBooleanTagAttribute ("checked", "?checked='${item.checked}'", booleanProducer))
+                .addAttribute (new AnyBooleanTagAttribute<> ("checked", (ta) -> "?checked='${item." + ta.getPropertyId () + "}'", booleanProducer))
                 .getLitRenderer ();
     }
 }
