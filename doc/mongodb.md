@@ -102,3 +102,30 @@ MongoDB server version: 4.4.14
 
 ```
 
+## Run clients
+
+<https://stackoverflow.com/questions/8971151/file-write-operations-in-mongo-script>
+
+```
+$ mongo mongodb://my-fancy-mongo-server --ssl -u fancy_username -p fancy_password 
+
+```
+
+```
+./mongo mongodb://localhost:27017
+
+db.getSiblingDB("mydata").tagEntity.find().forEach(printjson)
+```
+
+```
+./mongo mongodb://localhost:27017/mydata --quiet --eval "db.tagEntity.find().forEach(printjson);" > tagEntity.txt
+./mongo mongodb://localhost:27017/mydata --quiet --eval "db.bookEntity.find().forEach(printjson);" > bookEntity.txt
+
+
+```
+
+Не работает
+
+```
+writeFile("/tmp/tagEntity.json", tojson(db.getSiblingDB("mydata").tagEntity.find()));
+```
