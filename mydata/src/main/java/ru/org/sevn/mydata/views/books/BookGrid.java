@@ -39,6 +39,9 @@ public class BookGrid extends Grid<BookModel> {
     private BiConsumer<BookModel, ClickEvent> rebuildClick = (e, evt) -> {};
 
     @Setter
+    private BiConsumer<BookModel, ClickEvent> verifiedClick = (e, evt) -> {};
+
+    @Setter
     @Accessors (fluent = true, chain = true)
     public static class Ctx {
         TagEntityRepository tagEntityRepository;
@@ -58,7 +61,23 @@ public class BookGrid extends Grid<BookModel> {
                         .addTagContent (e -> USymbol.CLOCKWISE_DOWNWARDS_AND_UPWARDS_OPEN_CIRCLE_ARROWS)
                         .addAttribute (new OnClick ( (e, evt) -> {
                             rebuildClick.accept ((BookModel) e, (ClickEvent) evt);
-                        })))
+                        })),
+                new Tag ("div")
+                        .addTagContent (e -> {
+                            var bm = (BookModel) e;
+                            if (bm.entity () != null &&
+                                    bm.entity ().verified () != null &&
+                                    bm.entity ().verified ()) {
+
+                                return USymbol.PLUS;
+                            }
+                            return USymbol.MINUS;
+                        })
+                        .addAttribute (new OnClick ( (e, evt) -> {
+                            verifiedClick.accept ((BookModel) e, (ClickEvent) evt);
+                        }))
+        //
+        )
                 .getLitRenderer ());
         control
                 .setFrozen (true)

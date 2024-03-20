@@ -8,4 +8,6 @@ public class USymbol {
     //0xD83D 0xDCC2
     public static final String OPEN_FOLDER = "\uD83D\uDCC2";
     public static final String CLOCKWISE_DOWNWARDS_AND_UPWARDS_OPEN_CIRCLE_ARROWS = "\uD83D\uDD03";
+    public static final String PLUS = "\u2795";
+    public static final String MINUS = "\u2796";
 }

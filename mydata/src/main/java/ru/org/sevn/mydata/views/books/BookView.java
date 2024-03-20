@@ -238,15 +238,51 @@ public class BookView extends VerticalLayout {
             var pathData = pathData (actx.settingsEntityRepository);
             if (pathData != null) {
                 var p = Path.of (pathData.toString (), lm.getPathId ());
-                
-                new VaTextDialog("Переиндексировать " + p.toString() + "?", VaTextDialog.BUTTON_Cancel)
-                        .configure(d -> {
-                            d.addButtonOk(() -> {
-                                return rebuild(p.toString());
+
+                new VaTextDialog ("Переиндексировать " + p.toString () + "?", VaTextDialog.BUTTON_Cancel)
+                        .configure (d -> {
+                            d.addButtonOk ( () -> {
+                                return rebuild (p.toString ());
                             });
-                        }).open();
+                        }).open ();
             }
 
+        });
+
+        grid.setVerifiedClick ( (lm, evt) -> {
+            if (lm.entity () != null) {
+                var e = lm.entity ();
+
+                var pathData = pathData (actx.settingsEntityRepository);
+                if (pathData != null) {
+                    var p = Path.of (pathData.toString (), lm.getPathId (), "index.md");
+                    var pi = Path.of (pathData.toString (), lm.getPathId (), "indexed.md");
+
+                    if (pi.toFile ().exists ()) {
+                        new VaTextDialog ("Перезаписать " + p.toString () + "?", VaTextDialog.BUTTON_Cancel)
+                                .configure (d -> {
+                                    d.addButtonOk ( () -> {
+
+                                        try {
+                                            Files.copy (pi, p);
+                                            e.verified (true);
+                                            lm.entity (actx.bookEntityRepository.save (e));
+                                            dp.refreshAll ();
+                                            Notification.show ("Файл " + p + " перезаписан");
+                                            return true;
+                                        }
+                                        catch (IOException ex) {
+                                            Notification.show ("Can't write into: " + p);
+                                            error (log, ex);
+                                            return false;
+                                        }
+
+                                    });
+                                }).open ();
+                    }
+                }
+
+            }
         });
     }
 
@@ -256,13 +292,13 @@ public class BookView extends VerticalLayout {
 
             var pathData = pathData (actx.settingsEntityRepository);
             var fileProcessor = new BookFileProcessor (pathData, actx.bookEntityRepository, actx.tagEntityComponent);
-            fileProcessor.setPathLog(new ArrayList<>());
+            fileProcessor.setPathLog (new ArrayList<> ());
             fileProcessor.setDirExact (dirPath);
             final FileWalker fileWalker = new FileWalker (fileProcessor);
 
             Files.walkFileTree (dirPath, fileWalker);
-            
-            Notification.show ("Проиндексировано файлов: " + fileProcessor.getPathLog().size());
+
+            Notification.show ("Проиндексировано файлов: " + fileProcessor.getPathLog ().size ());
 
             return true;
         }

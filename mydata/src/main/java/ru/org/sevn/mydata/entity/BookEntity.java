@@ -46,6 +46,8 @@ public class BookEntity extends DbEntity implements Identified<String> {
     @Language
     private String lang;
 
+    private Boolean verified;
+
     public String getPathId () {
         return pathId;
     }
@@ -125,6 +127,14 @@ public class BookEntity extends DbEntity implements Identified<String> {
 
     public void setContentSize (List<StringLongObject> contentSize) {
         this.contentSize = contentSize;
+    }
+
+    public Boolean getVerified () {
+        return verified;
+    }
+
+    public void setVerified (Boolean verified) {
+        this.verified = verified;
     }
 
 }

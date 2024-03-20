@@ -11,7 +11,7 @@ public class VaTextDialog extends VaDialog<Div> {
     public VaTextDialog (String msg, String closeButtonTitle) {
         this (ATTENTION, msg, closeButtonTitle);
     }
-    
+
     public VaTextDialog (String title, String msg, String closeButtonTitle) {
         super (title, new Div (msg));
         addButton (closeButtonTitle, () -> true);

@@ -29,7 +29,7 @@ public class BookFileProcessor implements FileProcessor {
     @Setter
     @Getter
     private List<Path> pathLog;
-    
+
     @Setter
     private Path dirExact;
 
@@ -73,7 +73,7 @@ public class BookFileProcessor implements FileProcessor {
 
                     writeIndexed (dir, filePath.getParent (), be, FILE_NAME_INDEXED);
                     if (pathLog != null) {
-                        pathLog.add(filePath);
+                        pathLog.add (filePath);
                     }
                 }
             }
