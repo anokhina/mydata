@@ -19,6 +19,7 @@ public class BookModel {
     @NotEmpty
     @NotNull
     private String title;
+    private String titleShort;
     private String author;
     private String dsc;
     @NotEmpty
@@ -40,6 +41,14 @@ public class BookModel {
 
     public void setPathId (String pathId) {
         this.pathId = pathId;
+    }
+
+    public String getTitleShort() {
+        return titleShort;
+    }
+
+    public void setTitleShort(String titleShort) {
+        this.titleShort = titleShort;
     }
 
     public String getTitle () {

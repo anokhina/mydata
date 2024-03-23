@@ -14,11 +14,15 @@ public class FileUtil {
     }
 
     public static void open (ThrowableSupplier<Throwable, String> pathSupp) {
+        open(new FileOpener (), pathSupp);
+    }
+    
+    public static void open (FileOpener fo, ThrowableSupplier<Throwable, String> pathSupp) {
         String path = null;
         try {
             path = pathSupp.get ();
 
-            var err = new FileOpener ().dir (path);
+            var err = fo.dir (path);
             if (err != null) {
                 Notification.show ("Error: can't open " + path + ". " + err);
             }

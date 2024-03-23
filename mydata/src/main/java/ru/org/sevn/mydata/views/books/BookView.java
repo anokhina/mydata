@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,8 @@ import ru.org.sevn.va.dialog.VaDialog;
 import ru.org.sevn.va.dialog.VaTextDialog;
 import ru.org.sevn.va.textField.VaTextField;
 import static ru.org.sevn.log.LogUtil.*;
+import ru.org.sevn.mydata.sys.FileOpener;
+import ru.org.sevn.mydata.views.FileUtil;
 
 @PageTitle ("Books")
 @Route (value = "books")
@@ -147,10 +150,17 @@ public class BookView extends VerticalLayout {
                     var isNew = (entity.getId () == null);
 
                     try {
+                        if (isNew) {
+                            var prefix = editorAdd.getMessage ().getBinder ().getBean ().titleShort();
+                            if (!StringUtils.isEmpty(prefix)) {
+                                entity.pathId(entity.pathId() + "_" + prefix);
+                            }
+                        }
                         var entityDirPath = Path.of (pathData.toString (), entity.pathId ());
                         if (isNew) {
                             BookFileProcessor.writeIndexed (pathData, entity, "index.md");
                             new VaTextDialog ("Создано описание в " + entityDirPath).open ();
+                            FileUtil.open (new FileOpener(FileOpener.XDG_OPEN), () -> entityDirPath.toString());
                         }
                         else {
                             var mapcs = FileIndexer.getContentSizes (entityDirPath, entity.getContent ().split ("\n"));

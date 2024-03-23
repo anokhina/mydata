@@ -28,6 +28,7 @@ public class BookPanel extends VerticalLayout {
 
     private FormLayout form = new FormLayout ();
 
+    private TextField titleShort = new TextField ("titleShort");
     private TextField title = new TextField ("title");
     private TextField author = new TextField ("author");
     private TextArea dsc = new TextArea ("dsc");
@@ -55,7 +56,7 @@ public class BookPanel extends VerticalLayout {
 
         form.setSizeFull ();
         add (form);
-        form.add (lang, title, author, img, new Div (), url, content, dsc, tags);
+        form.add (lang, title, author, img, titleShort, url, content, dsc, tags);
         //binder.setValidatorsDisabled(false);
         content.setHeight ("30em");
         dsc.setHeight ("30em");
