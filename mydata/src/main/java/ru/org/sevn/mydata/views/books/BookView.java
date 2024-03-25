@@ -151,16 +151,16 @@ public class BookView extends VerticalLayout {
 
                     try {
                         if (isNew) {
-                            var prefix = editorAdd.getMessage ().getBinder ().getBean ().titleShort();
-                            if (!StringUtils.isEmpty(prefix)) {
-                                entity.pathId(entity.pathId() + "_" + prefix);
+                            var prefix = editorAdd.getMessage ().getBinder ().getBean ().titleShort ();
+                            if (! StringUtils.isEmpty (prefix)) {
+                                entity.pathId (entity.pathId () + "_" + prefix);
                             }
                         }
                         var entityDirPath = Path.of (pathData.toString (), entity.pathId ());
                         if (isNew) {
                             BookFileProcessor.writeIndexed (pathData, entity, "index.md");
                             new VaTextDialog ("Создано описание в " + entityDirPath).open ();
-                            FileUtil.open (new FileOpener(FileOpener.XDG_OPEN), () -> entityDirPath.toString());
+                            FileUtil.open (new FileOpener (FileOpener.XDG_OPEN), () -> entityDirPath.toString ());
                         }
                         else {
                             var mapcs = FileIndexer.getContentSizes (entityDirPath, entity.getContent ().split ("\n"));

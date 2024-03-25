@@ -8,20 +8,21 @@ import java.util.logging.Logger;
 import org.json.JSONObject;
 
 public class FileOpener {
-    
+
     public static final String EXPLORER = "explorer";
     public static final String KRUSADER = "krusader";
     public static final String XDG_OPEN = "xdg-open";
-    
+
     private final String commandName;
 
-    public FileOpener() {
-        this(KRUSADER);
+    public FileOpener () {
+        this (KRUSADER);
     }
-    public FileOpener(String opener) {
+
+    public FileOpener (String opener) {
         this.commandName = opener;
     }
-    
+
     public String dir (String p) throws Exception {
         final String path = p;
         if (path != null) {

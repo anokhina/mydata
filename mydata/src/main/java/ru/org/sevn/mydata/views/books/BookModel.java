@@ -43,11 +43,11 @@ public class BookModel {
         this.pathId = pathId;
     }
 
-    public String getTitleShort() {
+    public String getTitleShort () {
         return titleShort;
     }
 
-    public void setTitleShort(String titleShort) {
+    public void setTitleShort (String titleShort) {
         this.titleShort = titleShort;
     }
 

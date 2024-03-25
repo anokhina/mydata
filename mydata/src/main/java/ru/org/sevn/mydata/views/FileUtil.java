@@ -14,9 +14,9 @@ public class FileUtil {
     }
 
     public static void open (ThrowableSupplier<Throwable, String> pathSupp) {
-        open(new FileOpener (), pathSupp);
+        open (new FileOpener (), pathSupp);
     }
-    
+
     public static void open (FileOpener fo, ThrowableSupplier<Throwable, String> pathSupp) {
         String path = null;
         try {

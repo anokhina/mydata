@@ -4,7 +4,7 @@ import com.querydsl.core.types.dsl.StringPath;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -21,8 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import ru.org.sevn.mongo.IndexLanguageEnum;
 import ru.org.sevn.mydata.entity.TagEntity;
 import ru.org.sevn.mydata.repo.TagEntityRepository;
+import ru.org.sevn.mydata.sys.FileOpener;
 import ru.org.sevn.mydata.views.FileUtil;
 import ru.org.sevn.va.combo.VaEntityMultiselectCombobox;
+import ru.org.sevn.va.dialog.VaTextDialog;
 
 public class BookPanel extends VerticalLayout {
 
@@ -64,7 +66,7 @@ public class BookPanel extends VerticalLayout {
 
         var generateContent = new Button ("Generate content", evt -> {
             //TODO path exception
-            var dirPath = Path.of (ctx.supplierDataDir.get ().toString (), binder.getBean ().pathId ());
+            var dirPath = dirPath(ctx);
             var fileNames = dirPath.toFile ().list ( (dir, name) -> {
                 if (StringUtils.equalsAny (name, "index.md", "indexed.md", "img.png")) {
                     return false;
@@ -75,16 +77,46 @@ public class BookPanel extends VerticalLayout {
             content.setValue (val);
         });
         var openDir = new Button ("Open dir", evt -> {
-            FileUtil.open ( () -> {
-                var dirPath = Path.of (ctx.supplierDataDir.get ().toString (), binder.getBean ().pathId ());
-                return dirPath.toString ();
-            });
+            if (evt.isCtrlKey()) {
+                FileUtil.open (new FileOpener (FileOpener.XDG_OPEN), () -> {
+                    return dirPath(ctx).toString ();
+                });
+                
+            } else {
+                FileUtil.open ( () -> {
+                    return dirPath(ctx).toString ();
+                });
+            }
+        });
+        var mkDir = new Button ("Mkdir", evt -> {
+            if (binder.getBean ().getEntity() == null || binder.getBean ().getEntity().getId() == null) {
+                var dirPath = dirPath(ctx);
+                new VaTextDialog ("Создать " + dirPath + "?", VaTextDialog.BUTTON_Cancel)
+                        .configure (d -> {
+                            d.addButtonOk ( () -> {
+                                dirPath.toFile().mkdirs();
+                                Notification.show("Dir is created: " + dirPath);
+                                return true;
+                            });
+                        }).open ();
+            } else {
+                Notification.show("Mkdir is not supported");
+            }
         });
 
         var buttons = new HorizontalLayout ();
         add (buttons);
 
-        buttons.add (generateContent, openDir);
+        buttons.add (generateContent, openDir, mkDir);
+    }
+    
+    private Path dirPath(Ctx ctx) {
+        var dirPath = Path.of (ctx.supplierDataDir.get ().toString (), binder.getBean ().pathId ());
+        if (binder.getBean ().getEntity() == null || binder.getBean ().getEntity().getId() == null) {
+            var prefix = titleShort.getValue();
+            dirPath = Path.of (ctx.supplierDataDir.get ().toString (), binder.getBean ().pathId () + "_" + prefix);
+        }
+        return dirPath;
     }
 
     public Binder<BookModel> getBinder () {
