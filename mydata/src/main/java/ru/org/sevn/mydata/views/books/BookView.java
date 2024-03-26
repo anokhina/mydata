@@ -152,7 +152,7 @@ public class BookView extends VerticalLayout {
                     try {
                         if (isNew) {
                             var prefix = editorAdd.getMessage ().getBinder ().getBean ().titleShort ();
-                            if (! StringUtils.isEmpty (prefix)) {
+                            if (! StringUtils.isEmpty (prefix) && ! prefix.equals (entity.pathId ())) {
                                 entity.pathId (entity.pathId () + "_" + prefix);
                             }
                         }

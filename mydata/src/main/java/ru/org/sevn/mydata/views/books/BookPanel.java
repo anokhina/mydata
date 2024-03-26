@@ -65,55 +65,100 @@ public class BookPanel extends VerticalLayout {
         binder.bindInstanceFields (this);
 
         var generateContent = new Button ("Generate content", evt -> {
-            //TODO path exception
-            var dirPath = dirPath(ctx);
-            var fileNames = dirPath.toFile ().list ( (dir, name) -> {
-                if (StringUtils.equalsAny (name, "index.md", "indexed.md", "img.png")) {
-                    return false;
-                }
-                return true;
-            });
-            var val = Stream.of (fileNames).collect (Collectors.joining ("\n"));
-            content.setValue (val);
+            var dirPath = dirPath (ctx);
+            generateContent (dirPath);
         });
         var openDir = new Button ("Open dir", evt -> {
-            if (evt.isCtrlKey()) {
+            if (evt.isCtrlKey ()) {
                 FileUtil.open (new FileOpener (FileOpener.XDG_OPEN), () -> {
-                    return dirPath(ctx).toString ();
+                    return dirPath (ctx).toString ();
                 });
-                
-            } else {
+
+            }
+            else {
                 FileUtil.open ( () -> {
-                    return dirPath(ctx).toString ();
+                    return dirPath (ctx).toString ();
                 });
             }
         });
         var mkDir = new Button ("Mkdir", evt -> {
-            if (binder.getBean ().getEntity() == null || binder.getBean ().getEntity().getId() == null) {
-                var dirPath = dirPath(ctx);
+            if (binder.getBean ().getEntity () == null || binder.getBean ().getEntity ().getId () == null) {
+                var dirPath = dirPath (ctx);
                 new VaTextDialog ("Создать " + dirPath + "?", VaTextDialog.BUTTON_Cancel)
                         .configure (d -> {
                             d.addButtonOk ( () -> {
-                                dirPath.toFile().mkdirs();
-                                Notification.show("Dir is created: " + dirPath);
+                                dirPath.toFile ().mkdirs ();
+                                Notification.show ("Dir is created: " + dirPath);
                                 return true;
                             });
                         }).open ();
-            } else {
-                Notification.show("Mkdir is not supported");
+            }
+            else {
+                Notification.show ("Mkdir is not supported");
             }
         });
+        var load = new Button ("Load", evt -> {
+            var prefix = titleShort.getValue ();
+            if ( (binder.getBean ().getEntity () == null || binder.getBean ().getEntity ().getId () == null) && StringUtils.isNotBlank (prefix)) {
 
+                var dirPath = Path.of (ctx.supplierDataDir.get ().toString (), prefix);
+                new VaTextDialog ("Загрузить " + dirPath + "?", VaTextDialog.BUTTON_Cancel)
+                        .configure (d -> {
+                            d.addButtonOk ( () -> {
+                                if (! dirPath.toFile ().exists ()) {
+                                    Notification.show ("Dir doesn't exist: " + dirPath);
+                                }
+                                else {
+
+                                    binder.getBean ().pathId (prefix);
+                                    var fileNames = contentFiles (dirPath);
+                                    if (fileNames.length > 0) {
+                                        title.setValue (fileNames [0]);
+                                        author.setValue (fileNames [0]);
+                                    }
+                                    generateContent (fileNames);
+
+                                    Notification.show ("Dir is loaded: " + dirPath);
+                                }
+                                return true;
+                            });
+                        }).open ();
+            }
+            else {
+                Notification.show ("Load is not supported");
+            }
+        });
         var buttons = new HorizontalLayout ();
         add (buttons);
 
-        buttons.add (generateContent, openDir, mkDir);
+        buttons.add (generateContent, openDir, mkDir, load);
     }
-    
-    private Path dirPath(Ctx ctx) {
+
+    private String [] contentFiles (Path dirPath) {
+        //TODO path exception
+        var fileNames = dirPath.toFile ().list ( (dir, name) -> {
+            if (StringUtils.equalsAny (name, "index.md", "indexed.md", "img.png")) {
+                return false;
+            }
+            return true;
+        });
+        return fileNames;
+    }
+
+    private void generateContent (Path dirPath) {
+        var fileNames = contentFiles (dirPath);
+        generateContent (fileNames);
+    }
+
+    private void generateContent (String [] fileNames) {
+        var val = Stream.of (fileNames).collect (Collectors.joining ("\n"));
+        content.setValue (val);
+    }
+
+    private Path dirPath (Ctx ctx) {
         var dirPath = Path.of (ctx.supplierDataDir.get ().toString (), binder.getBean ().pathId ());
-        if (binder.getBean ().getEntity() == null || binder.getBean ().getEntity().getId() == null) {
-            var prefix = titleShort.getValue();
+        var prefix = titleShort.getValue ();
+        if ( (binder.getBean ().getEntity () == null || binder.getBean ().getEntity ().getId () == null) && ! binder.getBean ().pathId ().equals (prefix)) {
             dirPath = Path.of (ctx.supplierDataDir.get ().toString (), binder.getBean ().pathId () + "_" + prefix);
         }
         return dirPath;
