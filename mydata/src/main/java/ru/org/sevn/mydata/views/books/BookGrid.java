@@ -125,8 +125,16 @@ public class BookGrid extends Grid<BookModel> {
             headerRow.getCell (title).setComponent (tf);
         }
         {
+            ListPath<String, StringPath> path = QBookEntity.bookEntity.author;
+            var tf = new TextFieldFilter (path.getMetadata(), null, (n, v) -> {
+                filter.setPropertyFilter (n, v == null ? null : path.any().containsIgnoreCase (v));
+            });
+            filter.setPropertyFilter (tf.getName (), null);
+            headerRow.getCell (author).setComponent (tf);
+        }
+        {
             ListPath<TagEntity, QTagEntity> path = QBookEntity.bookEntity.tags;
-            var tf = new TagsFilter ( () -> ctx.tagEntityRepository, path, (n, v) -> {
+            var tf = new TagsFilter ( () -> ctx.tagEntityRepository, path, null, (n, v) -> {
                 if (v == null || v.isEmpty ()) {
                     filter.setPropertyFilter (n, null);
                 }

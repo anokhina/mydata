@@ -1,5 +1,7 @@
 package ru.org.sevn.va.grid;
 
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.PathMetadata;
 import com.querydsl.core.types.dsl.StringPath;
 import com.vaadin.flow.component.textfield.TextField;
 import java.util.function.BiConsumer;
@@ -9,12 +11,24 @@ public class TextFieldFilter extends TextField {
     private final String name;
     private boolean trimInput = true;
 
-    public TextFieldFilter (StringPath path, BiConsumer<String, String> valueConsumer) {
+    public TextFieldFilter (Path path, BiConsumer<String, String> valueConsumer) {
         this (path, path.getMetadata ().getName (), valueConsumer);
     }
 
-    public TextFieldFilter (StringPath path, String label, BiConsumer<String, String> valueConsumer) {
-        name = path.getMetadata ().getName ();
+    public TextFieldFilter (PathMetadata path, BiConsumer<String, String> valueConsumer) {
+        this (path.getName(), path.getName (), valueConsumer);
+    }
+    
+    public TextFieldFilter (PathMetadata path, String label, BiConsumer<String, String> valueConsumer) {
+        this (path.getName(), label, valueConsumer);
+    }
+    
+    public TextFieldFilter (Path path, String label, BiConsumer<String, String> valueConsumer) {
+        this(path.getMetadata(), label, valueConsumer);
+    }
+    
+    public TextFieldFilter (String name, String label, BiConsumer<String, String> valueConsumer) {
+        this.name = name;
         var tf = this;
         tf.setLabel (label);
         tf.setWidthFull ();

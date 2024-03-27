@@ -34,6 +34,8 @@ public class TagsFilter extends VaEntityMultiselectCombobox<TagEntity> {
         addValueChangeListener (evt -> {
             valueConsumer.accept (name, evt.getValue ());
         });
+        
+        tagsCombo.setLabel(label);
     }
 
     public String getName () {
